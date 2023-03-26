@@ -4,8 +4,12 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 
+//class for controling battle scenario
 public class BattleScript : MonoBehaviour
-{
+{    
+    const string Attack = "attack";
+    const string Defense = "defense";
+
     [Header("Health Bar")]
     [SerializeField] Slider[] playerHP;
     [SerializeField] Slider[] enemyHP;
@@ -19,6 +23,7 @@ public class BattleScript : MonoBehaviour
     [Header("Enemy")]
     [SerializeField] List<CreatureSO> enemy = new List<CreatureSO>();
 
+    //struct containing param when attacking
     struct AttackParam {
         public CreatureSO attacker;
         public CreatureSO defender;
@@ -29,10 +34,10 @@ public class BattleScript : MonoBehaviour
         }
     }
 
-    const string Attack = "attack";
-    const string Defense = "defense";
-
+    //enemy turn indicator
     bool enemyTurn = false;
+
+    //data to determine AI action based on player, temp and will be changed to struct
     string playerAction;
 
     void Awake() {
@@ -51,6 +56,7 @@ public class BattleScript : MonoBehaviour
         enemyHP[0].value = enemy[0].getHealth();
     }
 
+    //func called when either side are attacking, need to split player and enemy?
     void AttackAction(AttackParam action){
         float damage;
         if (action.defender.getOnDefense()) {
@@ -87,6 +93,8 @@ public class BattleScript : MonoBehaviour
         }
     }
 
+    //func to determine enemy action
+    //will be moved to their SO so each archetype have unique AI
     void EnemyAction(){
         switch (playerAction)
         {
