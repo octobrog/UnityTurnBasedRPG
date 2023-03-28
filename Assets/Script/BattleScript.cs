@@ -42,30 +42,54 @@ public class BattleScript : MonoBehaviour
     //data to determine AI action based on player, temp and will be changed to struct
     string playerAction;
 
-    void Awake() {
-        playerHP[0].maxValue = player[0].getMaxHealth();
-        enemyHP[0].maxValue = enemy[0].getMaxHealth();
-        PlayerHPText.Add(playerHP[0].GetComponentInChildren<TextMeshProUGUI>());
-        EnemyHPText.Add(enemyHP[0].GetComponentInChildren<TextMeshProUGUI>());
-        PlayerHPText[0].text = player[0].getMaxHealth().ToString("R");
-        EnemyHPText[0].text = enemy[0].getMaxHealth().ToString("R");
-        player[0].setHealth(player[0].getMaxHealth());
-        enemy[0].setHealth(enemy[0].getMaxHealth());
+    //setter for enemy and player object
+    public void enemySetter(List<CreatureSO> enemy){
+        this.enemy = enemy;
     }
 
-    void Update() {
+    public void playerSetter(List<CreatureSO> player){
+        this.player = player;
+    }
+
+    void Awake() {
+        setBattleScene();
+    }
+
+    // void Update() {}
+
+    //func to control player and enemy turn
+    void TurnManager(){
         if (enemyTurn){
-            EnemyAction();
             enemyTurn = false;
+            EnemyAction();
         }
+        //TO DO : add turn and damage indicator
         playerHP[0].value = player[0].getHealth();
         enemyHP[0].value = enemy[0].getHealth();
         PlayerHPText[0].text = player[0].getHealth().ToString("R");
         EnemyHPText[0].text = enemy[0].getHealth().ToString("R");
     }
 
+    //func to set battle scene UI
+    void setBattleScene(){
+        //set hp bar max value
+        playerHP[0].maxValue = player[0].getMaxHealth();
+        enemyHP[0].maxValue = enemy[0].getMaxHealth();
+
+        //set hp count text
+        PlayerHPText.Add(playerHP[0].GetComponentInChildren<TextMeshProUGUI>());
+        EnemyHPText.Add(enemyHP[0].GetComponentInChildren<TextMeshProUGUI>());
+        PlayerHPText[0].text = player[0].getMaxHealth().ToString("R");
+        EnemyHPText[0].text = enemy[0].getMaxHealth().ToString("R");
+
+        //return health to full
+        player[0].setHealth(player[0].getMaxHealth());
+        enemy[0].setHealth(enemy[0].getMaxHealth());
+    }
+
     //func called when either side are attacking, need to split player and enemy?
     void AttackAction(AttackParam action){
+        //set on defense false when attacking
         if (action.attacker.getOnDefense()){
             ToogleDefense(action.attacker);
         }
@@ -94,6 +118,7 @@ public class BattleScript : MonoBehaviour
         AttackAction(param);
         enemyTurn = true;
         playerAction = Attack;
+        TurnManager();
     }
 
     public void PlayerDefense(){
@@ -101,6 +126,7 @@ public class BattleScript : MonoBehaviour
             ToogleDefense(player[0]);
             enemyTurn = true;
             playerAction = Defense;
+            TurnManager();     
         }
     }
 
@@ -119,5 +145,6 @@ public class BattleScript : MonoBehaviour
             default:
                 break;
         }
+        TurnManager(); 
     }
 }
