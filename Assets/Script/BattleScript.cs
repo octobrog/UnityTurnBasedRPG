@@ -13,6 +13,8 @@ public class BattleScript : MonoBehaviour
     [Header("Health Bar")]
     [SerializeField] Slider[] playerHP;
     [SerializeField] Slider[] enemyHP;
+    List<TextMeshProUGUI> PlayerHPText = new List<TextMeshProUGUI>();
+    List<TextMeshProUGUI> EnemyHPText = new List<TextMeshProUGUI>();
 
     [Header("Action")]
     [SerializeField] GameObject[] actionButtons;
@@ -43,6 +45,10 @@ public class BattleScript : MonoBehaviour
     void Awake() {
         playerHP[0].maxValue = player[0].getMaxHealth();
         enemyHP[0].maxValue = enemy[0].getMaxHealth();
+        PlayerHPText.Add(playerHP[0].GetComponentInChildren<TextMeshProUGUI>());
+        EnemyHPText.Add(enemyHP[0].GetComponentInChildren<TextMeshProUGUI>());
+        PlayerHPText[0].text = player[0].getMaxHealth().ToString("R");
+        EnemyHPText[0].text = enemy[0].getMaxHealth().ToString("R");
         player[0].setHealth(player[0].getMaxHealth());
         enemy[0].setHealth(enemy[0].getMaxHealth());
     }
@@ -54,10 +60,15 @@ public class BattleScript : MonoBehaviour
         }
         playerHP[0].value = player[0].getHealth();
         enemyHP[0].value = enemy[0].getHealth();
+        PlayerHPText[0].text = player[0].getHealth().ToString("R");
+        EnemyHPText[0].text = enemy[0].getHealth().ToString("R");
     }
 
     //func called when either side are attacking, need to split player and enemy?
     void AttackAction(AttackParam action){
+        if (action.attacker.getOnDefense()){
+            ToogleDefense(action.attacker);
+        }
         float damage;
         if (action.defender.getOnDefense()) {
             damage = action.attacker.getAttack() - 1.5f*(action.defender.getDefense());
