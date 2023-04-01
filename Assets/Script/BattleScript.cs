@@ -15,6 +15,8 @@ public class BattleScript : MonoBehaviour
     [SerializeField] Slider[] enemyHP;
     List<TextMeshProUGUI> PlayerHPText = new List<TextMeshProUGUI>();
     List<TextMeshProUGUI> EnemyHPText = new List<TextMeshProUGUI>();
+    [SerializeField] List<TextMeshProUGUI> PlayerDamageTakenText = new List<TextMeshProUGUI>();
+    [SerializeField] List<TextMeshProUGUI> EnemyDamageTakenText = new List<TextMeshProUGUI>();
 
     [Header("Action")]
     [SerializeField] GameObject[] actionButtons;
@@ -59,15 +61,15 @@ public class BattleScript : MonoBehaviour
 
     //func to control player and enemy turn
     void TurnManager(){
-        if (enemyTurn){
-            enemyTurn = false;
-            EnemyAction();
-        }
         //TO DO : add turn and damage indicator
         playerHP[0].value = player[0].getHealth();
         enemyHP[0].value = enemy[0].getHealth();
         PlayerHPText[0].text = player[0].getHealth().ToString("R");
         EnemyHPText[0].text = enemy[0].getHealth().ToString("R");
+
+        if (enemyTurn){
+            EnemyAction();
+        }
     }
 
     //func to set battle scene UI
@@ -93,7 +95,9 @@ public class BattleScript : MonoBehaviour
         if (action.attacker.getOnDefense()){
             ToogleDefense(action.attacker);
         }
+
         float damage;
+
         if (action.defender.getOnDefense()) {
             damage = action.attacker.getAttack() - 1.5f*(action.defender.getDefense());
             damage = Mathf.Floor(damage);
@@ -102,10 +106,17 @@ public class BattleScript : MonoBehaviour
             damage = action.attacker.getAttack() - (action.defender.getDefense());
         }
 
-        if (damage > 0){
-            action.defender.damageHealth(damage);
+        if (damage <= 0){
+            damage = 1f;
+        }
+
+        action.defender.damageHealth(damage);
+        if(enemyTurn){
+            Debug.Log("player " + damage.ToString("R"));
+            PlayerDamageTakenText[0].text = damage.ToString("R") + " dmg";
         }else{
-            action.defender.damageHealth(1f);
+            Debug.Log("enemy "+damage.ToString("R"));
+            EnemyDamageTakenText[0].text = damage.ToString("R")  + " dmg";
         }
     }
 
@@ -145,6 +156,7 @@ public class BattleScript : MonoBehaviour
             default:
                 break;
         }
+        enemyTurn = false;
         TurnManager(); 
     }
 }
